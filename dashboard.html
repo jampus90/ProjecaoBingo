@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo — Painel do Operador</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body class="tela-dashboard">
+
+  <h1 class="dash-titulo">🎱 Painel do Operador</h1>
+
+  <!-- ── SEÇÃO 1: NÚMERO SORTEADO ──────────────────────────── -->
+  <div class="dash-secao">
+    <div class="dash-secao-titulo">Número sorteado</div>
+
+    <label for="input-numero">Digite o número da pedra (1–75)</label>
+
+    <div style="display: flex; gap: 8px; margin-top: 6px;">
+      <input
+        type="number"
+        id="input-numero"
+        min="1"
+        max="75"
+        placeholder="Ex: 32"
+        style="flex: 1;"
+      >
+      <button class="btn btn-primario" id="btn-sortear" style="width: auto; margin: 0; padding: 10px 24px;">
+        Sortear
+      </button>
+    </div>
+
+    <!-- Dica: pressionar Enter também sorteia -->
+    <p style="font-size: 12px; color: #999; margin-top: 6px;">
+      Dica: pressione Enter para sortear sem usar o mouse
+    </p>
+
+    <!-- Lista de números já sorteados -->
+    <div style="margin-top: 16px;">
+      <div class="dash-secao-titulo" style="margin-bottom: 8px;">Já sorteados</div>
+      <div class="historico" id="historico-numeros">
+        <span style="font-size: 13px; color: #999;">Nenhum número ainda</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── SEÇÃO 2: RODADA ───────────────────────────────────── -->
+  <div class="dash-secao">
+    <div class="dash-secao-titulo">Rodada</div>
+
+    <label for="input-rodada">Número da rodada atual</label>
+    <input
+      type="text"
+      id="input-rodada"
+      value="1"
+      style="margin-top: 6px;"
+    >
+  </div>
+
+
+  <!-- ── SEÇÃO 3: PRÊMIOS ──────────────────────────────────── -->
+  <div class="dash-secao">
+    <div class="dash-secao-titulo">Prêmios</div>
+
+    <!--
+      Os campos de prêmio são criados dinamicamente pelo JS.
+      Começamos com 3 prêmios padrão, mas o operador pode
+      adicionar ou remover conforme a necessidade.
+    -->
+    <div id="container-premios"></div>
+
+    <button class="btn btn-secundario" id="btn-adicionar-premio" style="margin-top: 8px;">
+      + Adicionar prêmio
+    </button>
+  </div>
+
+
+  <!-- ── SEÇÃO 4: AÇÕES GERAIS ─────────────────────────────── -->
+  <div class="dash-secao">
+    <div class="dash-secao-titulo">Ações</div>
+
+    <button class="btn btn-perigo" id="btn-resetar" style="width: 100%; padding: 12px;">
+      🔄 Resetar jogo (apaga todos os números sorteados)
+    </button>
+  </div>
+
+
+  <!-- ── SCRIPTS ───────────────────────────────────────────── -->
+  <script src="bingo.js"></script>
+  <script>
+
+    // Cada prêmio: { quina: 1, descricao: 'Cesta de fruta' }
+    let premiosLocais = [
+      { quina: 1, descricao: '' },
+      { quina: 2, descricao: '' },
+      { quina: 3, descricao: '' }
+    ];
+
+
+    function renderizar() {
+      const historico = document.getElementById('historico-numeros');
+
+      if (estado.sorteados.length === 0) {
+        historico.innerHTML =
+          '<span style="font-size:13px; color:#999;">Nenhum número ainda</span>';
+      } else {
+        const ordenados = [...estado.sorteados].sort(function(a, b) { return a - b; });
+
+        historico.innerHTML = ordenados.map(function(num) {
+          return '<span class="historico-numero">' + getLetra(num) + num +
+            '<button class="historico-remover" title="Remover número" onclick="removerNumero(' + num + ')">×</button></span>';
+        }).join('');
+      }
+    }
+
+
+    function renderizarPremios() {
+      const container = document.getElementById('container-premios');
+      container.innerHTML = '';
+
+      premiosLocais.forEach(function(premio, indice) {
+        const linha = document.createElement('div');
+        linha.classList.add('premio-linha');
+
+        linha.innerHTML =
+          '<span style="font-size:13px; color:#888; min-width:70px;">' +
+            premio.quina + 'ª Quina' +
+          '</span>' +
+          '<input type="text" placeholder="Descrição do prêmio" value="' + premio.descricao + '" data-indice="' + indice + '">' +
+          '<button class="btn-remover" data-indice="' + indice + '">×</button>';
+
+        container.appendChild(linha);
+      });
+
+      container.querySelectorAll('input[data-indice]').forEach(function(input) {
+        input.addEventListener('input', function() {
+          const indice = Number(this.dataset.indice);
+          premiosLocais[indice].descricao = this.value;
+          setPremio([...premiosLocais]);
+        });
+      });
+
+      container.querySelectorAll('.btn-remover').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const indice = Number(this.dataset.indice);
+          premiosLocais.splice(indice, 1);
+
+          // Renumera as quinas para ficarem em ordem (1, 2, 3...)
+          premiosLocais.forEach(function(p, i) { p.quina = i + 1; });
+
+          renderizarPremios();
+          setPremio([...premiosLocais]);
+        });
+      });
+    }
+
+
+    document.getElementById('btn-sortear').addEventListener('click', function() {
+      const input = document.getElementById('input-numero');
+      const numero = Number(input.value);
+
+      if (!numero) {
+        alert('Digite um número antes de sortear.');
+        return;
+      }
+
+      sortearNumero(numero);
+      input.value = '';
+      input.focus();
+    });
+
+    document.getElementById('input-numero').addEventListener('keydown', function(evento) {
+      if (evento.key === 'Enter') {
+        document.getElementById('btn-sortear').click();
+      }
+    });
+
+    document.getElementById('input-rodada').addEventListener('input', function() {
+      setRodada(this.value);
+    });
+
+    document.getElementById('btn-adicionar-premio').addEventListener('click', function() {
+      premiosLocais.push({
+        quina: premiosLocais.length + 1,
+        descricao: ''
+      });
+      renderizarPremios();
+    });
+
+    document.getElementById('btn-resetar').addEventListener('click', function() {
+      const confirmado = confirm('Tem certeza? Isso vai apagar todos os números sorteados.');
+
+      if (confirmado) {
+        resetar();
+        document.getElementById('input-rodada').value = 1;
+      }
+    });
+
+    renderizarPremios();
+    renderizar();
+
+  </script>
+
+</body>
+</html>

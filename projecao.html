@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bingo — Projeção</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body class="tela-projecao">
+
+  <!-- ── CABEÇALHO ─────────────────────────────────────────── -->
+  <header class="cabecalho">
+    <span id="rodada-texto">RODADA 1</span>
+  </header>
+
+  <!-- ── LAYOUT PRINCIPAL (3 colunas via CSS Grid) ─────────── -->
+  <main class="layout-principal">
+
+    <!-- COLUNA 1: Grade dos 75 números -->
+    <div class="painel">
+
+      <!-- Letras B I N G O no topo -->
+      <div class="bingo-cabecalho">
+        <span class="bingo-letra">B</span>
+        <span class="bingo-letra">I</span>
+        <span class="bingo-letra">N</span>
+        <span class="bingo-letra">G</span>
+        <span class="bingo-letra">O</span>
+      </div>
+
+      <!-- Os 75 números serão inseridos aqui pelo JavaScript -->
+      <div class="bingo-grade" id="grade-numeros"></div>
+    </div>
+
+    <!-- COLUNA 2: Prêmios (acima) e número sorteado (abaixo) -->
+    <div class="coluna-lateral">
+
+      <!-- Prêmios -->
+      <div class="painel painel-premios">
+        <div class="premios-titulo" id="premios-titulo">Prêmios</div>
+
+        <!-- Os prêmios serão inseridos aqui pelo JavaScript -->
+        <div id="lista-premios"></div>
+      </div>
+
+      <!-- Número atual sorteado -->
+      <div class="painel painel-numero">
+        <div class="numero-atual" id="numero-atual">
+          <div class="numero-vazio">Aguardando<br>sorteio...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ── SCRIPTS ───────────────────────────────────────────── -->
+  <script src="bingo.js"></script>
+  <script>
+
+    function construirGrade() {
+      const grade = document.getElementById('grade-numeros');
+
+      for (let linha = 1; linha <= 15; linha++) {
+        // Coluna B: linha+0  | I: linha+15 | N: linha+30 | G: linha+45 | O: linha+60
+        const numerosDaLinha = [
+          linha,
+          linha + 15,
+          linha + 30,
+          linha + 45,
+          linha + 60
+        ];
+
+        for (const numero of numerosDaLinha) {
+          const celula = document.createElement('div');
+          celula.classList.add('bingo-celula');
+          celula.textContent = numero;
+          celula.dataset.numero = numero;
+
+          grade.appendChild(celula);
+        }
+      }
+    }
+
+    construirGrade();
+
+    function renderizar() {
+      document.getElementById('rodada-texto').textContent =
+        'RODADA ' + estado.rodada;
+
+      document.querySelectorAll('.bingo-celula').forEach(function(celula) {
+        celula.classList.remove('sorteado');
+      });
+
+      estado.sorteados.forEach(function(numero) {
+        const celula = document.querySelector('[data-numero="' + numero + '"]');
+        if (celula) {
+          celula.classList.add('sorteado');
+        }
+      });
+
+
+      const painelNumero = document.getElementById('numero-atual');
+
+      if (estado.numeroAtual) {
+        painelNumero.innerHTML =
+          '<div class="numero-rotulo">Último número chamado:</div>' +
+          '<div class="numero-letra">' + estado.numeroAtual.letra + '</div>' +
+          '<div class="numero-valor">' + estado.numeroAtual.numero + '</div>';
+      } else {
+        painelNumero.innerHTML =
+          '<div class="numero-vazio">Aguardando<br>sorteio...</div>';
+      }
+
+      const listaPremios = document.getElementById('lista-premios');
+      listaPremios.innerHTML = '';
+
+      if (estado.premios.length === 0) {
+        listaPremios.innerHTML =
+          '<p style="color: #555; font-size: 14px;">Prêmios não configurados</p>';
+      } else {
+        estado.premios.forEach(function(premio) {
+          const item = document.createElement('div');
+          item.classList.add('premio-item');
+          item.innerHTML =
+            '<div class="premio-quina">' + premio.quina + 'ª Quina</div>' +
+            '<div class="premio-descricao">' + (premio.descricao || '—') + '</div>';
+          listaPremios.appendChild(item);
+        });
+      }
+    }
+
+    renderizar();
+
+  </script>
+
+</body>
+</html>
