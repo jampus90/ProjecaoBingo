@@ -9,16 +9,11 @@
 
 <body class="tela-projecao">
 
-  <!-- ── CABEÇALHO ─────────────────────────────────────────── -->
-  <header class="cabecalho">
-    <span id="rodada-texto">RODADA 1</span>
-  </header>
-
   <!-- ── LAYOUT PRINCIPAL (3 colunas via CSS Grid) ─────────── -->
   <main class="layout-principal">
 
     <!-- COLUNA 1: Grade dos 75 números -->
-    <div class="painel">
+    <div class="painel painel-grade">
 
       <!-- Letras B I N G O no topo -->
       <div class="bingo-cabecalho">
@@ -38,6 +33,7 @@
 
       <!-- Prêmios -->
       <div class="painel painel-premios">
+        <div class="rodada-texto" id="rodada-texto">RODADA 1</div>
         <div class="premios-titulo" id="premios-titulo">Prêmios</div>
 
         <!-- Os prêmios serão inseridos aqui pelo JavaScript -->
@@ -62,23 +58,29 @@
     function construirGrade() {
       const grade = document.getElementById('grade-numeros');
 
-      for (let linha = 1; linha <= 15; linha++) {
-        // Coluna B: linha+0  | I: linha+15 | N: linha+30 | G: linha+45 | O: linha+60
-        const numerosDaLinha = [
-          linha,
-          linha + 15,
-          linha + 30,
-          linha + 45,
-          linha + 60
-        ];
+      // Cada letra (B/I/N/G/O) tem 15 números, divididos em 2 sub-colunas:
+      // 1ª sub-coluna: 8 números | 2ª sub-coluna: 7 números (8 linhas no total)
+      const inicios = [1, 16, 31, 46, 61]; // início de cada letra
 
-        for (const numero of numerosDaLinha) {
-          const celula = document.createElement('div');
-          celula.classList.add('bingo-celula');
-          celula.textContent = numero;
-          celula.dataset.numero = numero;
+      for (let linha = 1; linha <= 8; linha++) {
+        for (const inicio of inicios) {
+          const numeroCol1 = inicio + (linha - 1);
+          const numeroCol2 = inicio + 7 + linha; // a partir do 9º número da letra
 
-          grade.appendChild(celula);
+          [numeroCol1, numeroCol2].forEach(function(numero) {
+            const celula = document.createElement('div');
+            celula.classList.add('bingo-celula');
+
+            const fimLetra = inicio + 14;
+            if (numero <= fimLetra) {
+              celula.textContent = numero;
+              celula.dataset.numero = numero;
+            } else {
+              celula.classList.add('bingo-celula-vazia');
+            }
+
+            grade.appendChild(celula);
+          });
         }
       }
     }

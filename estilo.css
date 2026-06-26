@@ -10,14 +10,14 @@
    Se quiser mudar uma cor, muda aqui e muda em todo lugar.
 ───────────────────────────────────────────────────────────── */
 :root {
-  /* Cores da projeção (fundo escuro) */
-  --cor-fundo:        #111111;
-  --cor-painel:       #1e1e1e;
-  --cor-borda:        #333333;
-  --cor-texto:        #ffffff;
-  --cor-texto-mudo:   #888888;
-  --cor-destaque:     #FFD700; /* amarelo para número sorteado */
-  --cor-letra-bingo:  #4a9eff; /* azul para B I N G O */
+  /* Cores da projeção (fundo claro) — contraste alto para ambientes com luz/projetor fraco */
+  --cor-fundo:        #ffffff;
+  --cor-painel:       #f2f2f2;
+  --cor-borda:        #999999;
+  --cor-texto:        #000000;
+  --cor-texto-mudo:   #444444;
+  --cor-destaque:     #d62828; /* vermelho forte para número sorteado */
+  --cor-letra-bingo:  #1d4ed8; /* azul forte para B I N G O */
 
   /* Cores do dashboard (fundo claro) */
   --cor-dash-fundo:   #f5f5f5;
@@ -62,22 +62,11 @@
   flex-direction: column;
 }
 
-/* Cabeçalho com o número da rodada */
-.cabecalho {
-  text-align: center;
-  padding: var(--espaco-sm) 0;
-  font-size: clamp(18px, 2.8vw, 32px);
-  color: var(--cor-texto-mudo);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--cor-borda);
-}
-
 /* Layout principal: 2 colunas lado a lado
    (grade do bingo + coluna lateral com prêmios/número) */
 .layout-principal {
   display: grid;
-  grid-template-columns: 2.2fr 1fr; /* grade do bingo + coluna lateral */
+  grid-template-columns: 2.6fr 0.8fr; /* grade do bingo + coluna lateral */
   gap: var(--espaco-md);
   padding: var(--espaco-md);
   flex: 1;
@@ -108,26 +97,31 @@
    GRADE DE NÚMEROS (painel da esquerda)
 ───────────────────────────────────────────────────────────── */
 
-/* Cabeçalho B I N G O */
+/* Cabeçalho B I N G O — cada letra ocupa 2 colunas (uma por sub-coluna de números) */
 .bingo-cabecalho {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   gap: 4px;
   margin-bottom: var(--espaco-sm);
 }
 
 .bingo-letra {
+  grid-column: span 2;
   text-align: center;
   font-size: clamp(20px, 3.2vw, 44px);
   font-weight: 700;
   color: var(--cor-letra-bingo);
+  text-shadow: 0 0 6px rgba(255,255,255,0.9);
+  border: 2px solid var(--cor-borda);
+  border-radius: 4px;
+  padding: 2px 0;
 }
 
-/* Grade com os 75 números */
+/* Grade com os 75 números — 2 colunas por letra, 8 linhas */
 .bingo-grade {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(15, 1fr);
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   gap: 4px;
   flex: 1;
   min-height: 0; /* permite que o grid encolha dentro do painel flex sem ultrapassar a altura */
@@ -138,25 +132,70 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(16px, 2.4vw, 32px);
+  font-size: clamp(24px, 4.2vw, 56px);
   font-weight: 600;
+  border: 2px solid var(--cor-borda);
   border-radius: 4px;
   color: transparent; /* número fica invisível até ser sorteado */
   background: rgba(255,255,255,0.03);
   transition: all 0.3s ease;
 }
 
+/* Célula vazia (preenchimento da 8ª linha na 2ª sub-coluna de cada letra) */
+.bingo-celula-vazia {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Linhas finas e contínuas separando os grupos de letras (B | I | N | G | O).
+   São desenhadas como overlay no painel (atrás do cabeçalho e da grade),
+   posicionadas a 20/40/60/80% da largura — limites entre cada par de colunas. */
+.painel-grade {
+  position: relative;
+}
+
+.painel-grade::before {
+  content: '';
+  position: absolute;
+  top: var(--espaco-md);
+  bottom: var(--espaco-md);
+  left: var(--espaco-md);
+  right: var(--espaco-md);
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--cor-texto), var(--cor-texto)),
+    linear-gradient(var(--cor-texto), var(--cor-texto)),
+    linear-gradient(var(--cor-texto), var(--cor-texto)),
+    linear-gradient(var(--cor-texto), var(--cor-texto));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: 20% 0, 40% 0, 60% 0, 80% 0;
+}
+
 /* Quando um número foi sorteado, ganha essa classe via JavaScript */
 .bingo-celula.sorteado {
-  background: rgba(255, 215, 0, 0.15);
+  background: rgba(255, 234, 0, 0.25);
   color: var(--cor-destaque);
   font-weight: 700;
+  text-shadow: 0 0 6px rgba(255,255,255,0.9);
 }
 
 
 /* ─────────────────────────────────────────────────────────────
    PAINEL DE PRÊMIOS (coluna do meio)
 ───────────────────────────────────────────────────────────── */
+/* Número da rodada, agora exibido dentro do painel de prêmios */
+.rodada-texto {
+  text-align: center;
+  font-size: clamp(16px, 2vw, 26px);
+  color: var(--cor-texto-mudo);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: var(--espaco-sm);
+  padding-bottom: var(--espaco-sm);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
 .premios-titulo {
   font-size: clamp(16px, 1.8vw, 22px);
   color: var(--cor-texto-mudo);
@@ -192,7 +231,7 @@
 
 .premio-descricao {
   font-size: clamp(18px, 2.4vw, 30px);
-  font-weight: 600;
+  font-weight: 400;
   color: var(--cor-texto);
 }
 
@@ -221,6 +260,7 @@
   font-weight: 900;
   color: var(--cor-texto);
   line-height: 1;
+  text-shadow: 0 0 10px rgba(255,255,255,0.9);
 }
 
 .numero-valor {
@@ -228,6 +268,7 @@
   font-weight: 900;
   color: var(--cor-destaque);
   line-height: 1;
+  text-shadow: 0 0 10px rgba(255,255,255,0.9);
 }
 
 /* Texto que aparece antes de um número ser sorteado */
