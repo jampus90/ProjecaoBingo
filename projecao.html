@@ -9,6 +9,14 @@
 
 <body class="tela-projecao">
 
+  <!-- ── POP-UP DO PREÇO DA RODADA (exibido até o 1º número ser sorteado) ── -->
+  <div class="overlay-preco" id="overlay-preco">
+    <div class="overlay-preco-caixa">
+      <div class="overlay-preco-rotulo">Preço desta rodada</div>
+      <div class="overlay-preco-valor" id="overlay-preco-valor"></div>
+    </div>
+  </div>
+
   <!-- ── LAYOUT PRINCIPAL (3 colunas via CSS Grid) ─────────── -->
   <main class="layout-principal">
 
@@ -92,6 +100,16 @@
 
       document.getElementById('rodada-texto').textContent =
         'RODADA ' + estado.rodada;
+
+      const overlayPreco = document.getElementById('overlay-preco');
+      const rodadaJaIniciou = estado.sorteados.length > 0;
+
+      if (!rodadaJaIniciou && estado.preco) {
+        document.getElementById('overlay-preco-valor').textContent = 'R$ ' + estado.preco;
+        overlayPreco.classList.add('visivel');
+      } else {
+        overlayPreco.classList.remove('visivel');
+      }
 
       document.querySelectorAll('.bingo-celula').forEach(function(celula) {
         celula.classList.remove('sorteado');

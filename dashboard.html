@@ -60,6 +60,14 @@
       value="1"
       style="margin-top: 6px;"
     >
+
+    <label for="input-preco" style="margin-top: 16px;">Preço da rodada</label>
+    <input
+      type="text"
+      id="input-preco"
+      placeholder="Ex: 5,00"
+      style="margin-top: 6px;"
+    >
   </div>
 
 
@@ -83,6 +91,13 @@
   <!-- ── SEÇÃO 4: AÇÕES GERAIS ─────────────────────────────── -->
   <div class="dash-secao">
     <div class="dash-secao-titulo">Ações</div>
+
+    <button class="btn btn-secundario" id="btn-selecionar-pasta" style="width: 100%; padding: 12px; margin-bottom: 8px;">
+      📁 Selecionar pasta para salvar histórico (CSV)
+    </button>
+    <p id="status-pasta-csv" style="font-size: 12px; color: #999; margin-top: -4px; margin-bottom: 16px;">
+      Pasta não conectada — clique para escolher onde salvar o histórico de rodadas.
+    </p>
 
     <button class="btn btn-perigo" id="btn-resetar" style="width: 100%; padding: 12px;">
       🔄 Resetar jogo (apaga todos os números sorteados)
@@ -187,6 +202,10 @@
       setRodada(this.value);
     });
 
+    document.getElementById('input-preco').addEventListener('input', function() {
+      setPreco(this.value);
+    });
+
     document.getElementById('btn-adicionar-premio').addEventListener('click', function() {
       premiosLocais.push({
         quina: premiosLocais.length + 1,
@@ -201,6 +220,7 @@
       if (confirmado) {
         resetar();
         document.getElementById('input-rodada').value = 1;
+        document.getElementById('input-preco').value = '';
       }
     });
 
@@ -208,6 +228,24 @@
     document.getElementById('btn-tema').addEventListener('click', function() {
       setTema(estado.tema === 'escuro' ? 'claro' : 'escuro');
     });
+
+    // ── PASTA DO HISTÓRICO (CSV) ────────────────────────────────
+    function atualizarStatusPastaCSV() {
+      const status = document.getElementById('status-pasta-csv');
+      status.textContent = pastaCSV
+        ? '✅ Pasta conectada — o histórico de rodadas é salvo em historico_rodadas.csv'
+        : 'Pasta não conectada — clique para escolher onde salvar o histórico de rodadas.';
+    }
+
+    document.getElementById('btn-selecionar-pasta').addEventListener('click', async function() {
+      await selecionarPastaCSV();
+      atualizarStatusPastaCSV();
+    });
+
+    (async function() {
+      await restaurarPastaCSV();
+      atualizarStatusPastaCSV();
+    })();
 
     renderizarPremios();
     renderizar();
