@@ -15,9 +15,9 @@
   --cor-painel:       #f2f2f2;
   --cor-borda:        #999999;
   --cor-texto:        #000000;
-  --cor-texto-mudo:   #444444;
+  --cor-texto-mudo:   #1a1a1a;
   --cor-destaque:     #d62828; /* vermelho forte para número sorteado */
-  --cor-letra-bingo:  #1d4ed8; /* azul forte para B I N G O */
+  --cor-letra-bingo:  #d81d1d; /* azul forte para B I N G O */
 
   /* Cores do dashboard (fundo claro) */
   --cor-dash-fundo:   #f5f5f5;
@@ -108,7 +108,7 @@
 .bingo-letra {
   grid-column: span 2;
   text-align: center;
-  font-size: clamp(20px, 3.2vw, 44px);
+  font-size: clamp(40px, 6vw, 64px);
   font-weight: 700;
   color: var(--cor-letra-bingo);
   text-shadow: 0 0 6px rgba(255,255,255,0.9);
@@ -187,7 +187,7 @@
 /* Número da rodada, agora exibido dentro do painel de prêmios */
 .rodada-texto {
   text-align: center;
-  font-size: clamp(16px, 2vw, 26px);
+  font-size: clamp(22px, 3vw, 38px);
   color: var(--cor-texto-mudo);
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -222,7 +222,7 @@
 }
 
 .premio-quina {
-  font-size: clamp(14px, 1.6vw, 18px);
+  font-size: clamp(20px, 2.4vw, 28px);
   color: var(--cor-texto-mudo);
   text-transform: uppercase;
   letter-spacing: 1px;
