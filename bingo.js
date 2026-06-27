@@ -2,7 +2,8 @@ const INICIAL_STATE ={
     rodada: 0,
     numeroAtual: null,
     sorteados:[],
-    premios:[]
+    premios:[],
+    tema: 'claro'
 };
 
 let estado = {...INICIAL_STATE, sorteados:[], premios:[]};
@@ -70,11 +71,18 @@ function setPremio(lista) {
     if(typeof renderizar === 'function') renderizar();
 }
 
+function setTema(tema) {
+    estado.tema = tema;
+    sincronizar();
+    if(typeof renderizar === 'function') renderizar();
+}
+
 function resetar() {
     estado = {
         ...INICIAL_STATE,
         sorteados: [],
-        premios: []
+        premios: [],
+        tema: estado.tema
     };
     sincronizar();
     if(typeof renderizar === 'function') renderizar();

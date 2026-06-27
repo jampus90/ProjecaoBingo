@@ -13,11 +13,12 @@
   /* Cores da projeção (fundo claro) — contraste alto para ambientes com luz/projetor fraco */
   --cor-fundo:        #ffffff;
   --cor-painel:       #f2f2f2;
-  --cor-borda:        #999999;
+  --cor-borda:        #000000;
   --cor-texto:        #000000;
   --cor-texto-mudo:   #1a1a1a;
-  --cor-destaque:     #d62828; /* vermelho forte para número sorteado */
-  --cor-letra-bingo:  #d81d1d; /* azul forte para B I N G O */
+  --cor-destaque:     #b00000; /* vermelho forte para número sorteado */
+  --cor-letra-bingo:  #b00000; /* vermelho forte para B I N G O */
+  --cor-sorteado-fundo: #ffd400; /* amarelo sólido para destacar número sorteado */
 
   /* Cores do dashboard (fundo claro) */
   --cor-dash-fundo:   #f5f5f5;
@@ -84,7 +85,7 @@
 /* Estilo base de cada painel (grade, prêmios, número) */
 .painel {
   background: var(--cor-painel);
-  border: 1px solid var(--cor-borda);
+  border: 2px solid var(--cor-borda);
   border-radius: 8px;
   padding: var(--espaco-md);
   display: flex;
@@ -111,8 +112,7 @@
   font-size: clamp(40px, 6vw, 64px);
   font-weight: 700;
   color: var(--cor-letra-bingo);
-  text-shadow: 0 0 6px rgba(255,255,255,0.9);
-  border: 2px solid var(--cor-borda);
+  border: 3px solid var(--cor-borda);
   border-radius: 4px;
   padding: 2px 0;
 }
@@ -134,10 +134,10 @@
   justify-content: center;
   font-size: clamp(24px, 4.2vw, 56px);
   font-weight: 600;
-  border: 2px solid var(--cor-borda);
+  border: 3px solid var(--cor-borda);
   border-radius: 4px;
   color: transparent; /* número fica invisível até ser sorteado */
-  background: rgba(255,255,255,0.03);
+  background: var(--cor-fundo);
   transition: all 0.3s ease;
 }
 
@@ -174,10 +174,9 @@
 
 /* Quando um número foi sorteado, ganha essa classe via JavaScript */
 .bingo-celula.sorteado {
-  background: rgba(255, 234, 0, 0.25);
-  color: var(--cor-destaque);
+  background: var(--cor-sorteado-fundo);
+  color: var(--cor-texto);
   font-weight: 700;
-  text-shadow: 0 0 6px rgba(255,255,255,0.9);
 }
 
 
@@ -452,4 +451,46 @@ input[type="text"]:focus {
 .historico-remover:hover {
   opacity: 1;
   color: var(--cor-perigo);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   DARK MODE (projeção)
+   Classe .modo-escuro aplicada no <body> junto com .tela-projecao,
+   controlada a partir do dashboard.
+───────────────────────────────────────────────────────────── */
+.tela-projecao.modo-escuro {
+  --cor-fundo:          #0d0d0d;
+  --cor-painel:         #1a1a1a;
+  --cor-borda:          #ffffff;
+  --cor-texto:          #ffffff;
+  --cor-texto-mudo:     #ffffff;
+  --cor-destaque:       #ffd400;
+  --cor-letra-bingo:    #ffd400;
+  --cor-sorteado-fundo: #ffd400;
+}
+
+/* Números já sorteados no grid: fundo amarelo, texto preto para contraste */
+.tela-projecao.modo-escuro .bingo-celula.sorteado {
+  color: #000000;
+}
+
+/* Painel de rodada/prêmios permanece sempre no visual claro,
+   mesmo com o modo escuro ativo na projeção */
+.tela-projecao.modo-escuro .painel-premios {
+  --cor-painel:      #f2f2f2;
+  --cor-borda:       #000000;
+  --cor-texto:       #000000;
+  --cor-texto-mudo:  #1a1a1a;
+}
+
+/* Botão de alternância de tema (no dashboard) */
+.btn-tema {
+  background: transparent;
+  border: 1px solid var(--cor-dash-borda);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--cor-dash-texto);
 }

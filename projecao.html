@@ -88,6 +88,8 @@
     construirGrade();
 
     function renderizar() {
+      document.body.classList.toggle('modo-escuro', estado.tema === 'escuro');
+
       document.getElementById('rodada-texto').textContent =
         'RODADA ' + estado.rodada;
 

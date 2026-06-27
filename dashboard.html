@@ -9,7 +9,10 @@
 
 <body class="tela-dashboard">
 
-  <h1 class="dash-titulo">🎱 Painel do Operador</h1>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h1 class="dash-titulo" style="margin-bottom: 0;">🎱 Painel do Operador</h1>
+    <button class="btn-tema" id="btn-tema">🌙 Modo escuro</button>
+  </div>
 
   <!-- ── SEÇÃO 1: NÚMERO SORTEADO ──────────────────────────── -->
   <div class="dash-secao">
@@ -100,6 +103,9 @@
 
 
     function renderizar() {
+      document.getElementById('btn-tema').textContent =
+        estado.tema === 'escuro' ? '☀️ Modo claro (projeção)' : '🌙 Modo escuro (projeção)';
+
       const historico = document.getElementById('historico-numeros');
 
       if (estado.sorteados.length === 0) {
@@ -196,6 +202,11 @@
         resetar();
         document.getElementById('input-rodada').value = 1;
       }
+    });
+
+    // ── TEMA (claro/escuro da projeção) ────────────────────────
+    document.getElementById('btn-tema').addEventListener('click', function() {
+      setTema(estado.tema === 'escuro' ? 'claro' : 'escuro');
     });
 
     renderizarPremios();
